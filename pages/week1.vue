@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import slider from '.../components/Slider.vue'
+import slider from '../components/Slider.vue'
 import * as Tone from 'tone'
     export default {
         components: { slider },
