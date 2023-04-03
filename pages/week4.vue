@@ -6,6 +6,7 @@
             <button @click="start()" class="py-4 text-center hover:italic hover:underline">Start</button>
         </div>
         <div v-if="started">
+            <p>{{  freqInterval }} || {{ timeInterval }} </p>
             <p>{{ frequency.value }} || {{ harmonicity.value }} || {{ modulation.value }}</p>
             <button v-if="started" @click="stop()" class="text-center italic hover:not-italic mt-2 underline hover:no-underline">Stop</button>
         </div>
@@ -26,7 +27,33 @@ export default {
             harmonicity: null,
             modulation: null,
             gain: null,
+            mouseX: null,
+            mouseY: null,
+            freqInterval: 1,
+            timeInterval: 100,
+            freqMax: 440,
+            freqMin: 40,
+            freqPlus: true,
         }
+    },
+    async mounted () {
+        console.log("mounted")
+        if (process.client) {
+            const { default: P5 } = await import('p5')
+            
+            const sketch = (s) => {
+                s.setup = () => {
+                    s.createCanvas(500, 500)
+                }
+                s.mouseMoved = (val) => {
+                    this.freqInterval = val.clientY/4
+                    this.timeInterval = val.clientX
+                }
+            }
+            // eslint-disable-next-line no-unused-vars
+            const canvas = new P5(sketch, 'p5Canvas')
+        }
+        
     },
     computed: {
         frequencyComp() {
@@ -56,25 +83,26 @@ export default {
             // from a user-initiated function.
             this.rnboDevice.node.connect(context.destination);
 
-            // const gainNode = context.createGain();
-            // gainNode.connect(context.destination);
-            // this.rnboDevice.node.connect(gainNode);
-
+            setInterval(this.updateFrequency, this.timeInterval)
+ 
             context.resume()
+        },
+        updateFrequency() {
+            if (this.frequency.value >= this.freqMax) this.freqPlus = false
+            if (this.frequency.value <= this.freqMin) this.freqPlus = true
+
+            if (this.freqPlus) {
+                this.frequency.value += this.freqInterval
+            }
+            if (!this.freqPlus) {
+                this.frequency.value += this.freqInterval * -1
+            }
         },
         async start() {
             console.log('starting')
             await this.setup()
             console.log(this.rnboDevice.outPorts)
             this.rnboDevice.parameters.forEach(parameter => {
-                // Each parameter has an ID as well as a name. The ID will include
-                // the full path to the parameter, including the names of any parent
-                // patchers if the parameter is in a subpatcher. So if the path contains
-                // any "/" characters, you know that it's not a top level parameter.
-
-                // Uncomment this line to include only top level parameters.
-                // if (parameter.id.includes("/")) return;
-
                 console.log(parameter.id);
                 console.log(parameter.value);
             });
@@ -83,7 +111,7 @@ export default {
             this.modulation = this.rnboDevice.parametersById.get("modulation-index")
             this.gain = this.rnboDevice.parametersById.get("gain")
 
-            this.gain.value = 1
+            this.gain.value = 0.2
 
             this.context.resume()
 
@@ -91,9 +119,9 @@ export default {
         },
         stop() {
             console.log('stopping')
-            this.gain.value = 0
+            this.gain.value = -1
             this.started = false
-        }
+        },
     },
 }
 </script>

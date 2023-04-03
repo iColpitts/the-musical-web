@@ -16,6 +16,7 @@
   "dependencies": {
     "@rnbo/js": "^1.1.0",
     "nuxt-socket-io": "^3.0.12",
+    "p5": "^1.6.0",
     "tone": "^14.7.77"
   }
 }
