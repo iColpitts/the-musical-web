@@ -2,12 +2,12 @@
     <div class="flex flex-col h-screen items-center justify-center">
         <div v-if="!started"> 
             <p class="text-fuchsia-600">RNBO Time Keeper</p>
-            <p class="text-xs">Built w/ Nuxt3, RNBO and a little bit of Tiger Trot horn action.</p>
+            <p class="text-xs">Built w/ Nuxt3, RNBO and p5.js solely to track mouse movements.</p>
             <button @click="start()" class="py-4 text-center hover:italic hover:underline">Start</button>
         </div>
         <div v-if="started">
-            <p>{{  freqInterval }} || {{ timeInterval }} </p>
-            <p>{{ frequency.value }} || {{ harmonicity.value }} || {{ modulation.value }}</p>
+            <!-- <p>{{  freqInterval }} || {{ timeInterval }} </p>
+            <p>{{ frequency.value }} || {{ harmonicity.value }} || {{ modulation.value }}</p> -->
             <button v-if="started" @click="stop()" class="text-center italic hover:not-italic mt-2 underline hover:no-underline">Stop</button>
         </div>
     </div>
