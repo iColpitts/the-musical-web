@@ -34,9 +34,9 @@
                 this.userData = data
             });
 
-            const presenceRef = ref(db, "disconnectmessage");
-            // Write a string when this client loses connection
-            onDisconnect(presenceRef).set(ref(db, 'user/'),  );
+            // const presenceRef = ref(db, "disconnectmessage");
+            // // Write a string when this client loses connection
+            // onDisconnect(presenceRef).set(ref(db, 'user/'),  );
 
         },
         methods: {
