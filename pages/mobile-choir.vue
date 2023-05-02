@@ -3,7 +3,7 @@
         <p>Mobile Choir</p>
         <p class="py-10">{{ this.granulatorData }}</p>
         <p class="py-10">{{  this.userData }}</p>
-        <button @click="granularSet">Granulator Set</button>
+        <button @click="granularSet">Granulator Set Button</button>
     </div>
 </template>
 
@@ -44,6 +44,11 @@
                 let db = useNuxtApp().$database
                 console.log('setting DB granulator')
                 set(ref(db, 'granulator/'), newData);
+            },
+            setDbUser(newData) {
+                let db = useNuxtApp().$database
+                console.log('setting DB granulator')
+                set(ref(db, 'users/'), newData);
             },
             granularSet() {
                 console.log('ganulator Setting')
