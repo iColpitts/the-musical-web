@@ -84,11 +84,13 @@
                 console.log('redistributing controls')
             },
             handleMotion(e) {
+                this.motion.on = true
                 this.motion.x = e.acceleration.x
                 this.motion.y = e.acceleration.y
                 this.motion.z = e.acceleration.z
             },
             handleOrientation(e) {
+                this.orientation.on = true
                 this.orientation.alpha = e.alpha
                 this.orientation.beta = e.beta
                 this.orientation.gamma = e.gamma 
