@@ -19,8 +19,8 @@
                 userData: null,
                 granulatorControls: null,
                 userNum: null,
-                motion: null,
-                orientation: null,
+                motion: { on: false },
+                orientation: { on: false },
             }
         },
         mounted () {
