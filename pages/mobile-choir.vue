@@ -1,8 +1,10 @@
 <template>
     <div class="w-full h-full m-auto p-16">
         <p>Mobile Choir</p>
-        <p class="py-10">{{ this.granulatorData }}</p>
-        <p class="py-10">{{  this.userData }}</p>
+        <p class="py-10" v-if="granulatorData">{{ granulatorData }}</p>
+        <p class="py-10" v-if="userData">{{  userData }}</p>
+        <p class="py-10" v-if="motion">{{ motion }}</p>
+        <p class="py-10" v-if="orientation">{{ orientation }}</p>
         <button @click="granularSet">Granulator Set Button</button>
     </div>
 </template>
@@ -17,11 +19,23 @@
                 userData: null,
                 granulatorControls: null,
                 userNum: null,
+                motion: null,
+                orientation: null,
             }
         },
         mounted () {
             let db = useNuxtApp().$database
             let dbRef = ref(db)
+
+            // if (
+            //     DeviceMotionEvent &&
+            //     typeof DeviceMotionEvent.requestPermission === "function"
+            // ) {
+            //     DeviceMotionEvent.requestPermission();
+            // }
+
+            window.addEventListener("devicemotion", this.handleMotion);
+            window.addEventListener("deviceorientation", this.handleOrientation);
 
             onValue(ref(db, 'granulator/'), (snapshot) => {
                 const data = snapshot.val();
@@ -69,6 +83,22 @@
             redistributeControl(){
                 console.log('redistributing controls')
             },
+            handleMotion(e) {
+                this.motion = e.acceleration
+            },
+            handleOrientation(e) {
+                this.orientation.alpha = e.alpha
+                this.orientation.beta = e.beta
+                this.orientation.gamma = e.gamma 
+            },
+            gyro_event (e) {
+                if (this.sensorData.time.length < 6000) {
+                    this.sensorData.time.push(this.gyroscope.time)
+                    this.sensorData.x.push(this.gyroscope.x)
+                    this.sensorData.y.push(this.gyroscope.y)
+                    this.sensorData.z.push(this.gyroscope.z)
+                }
+            }
         },        
     }
 </script>
