@@ -67,6 +67,7 @@
                     
                 this.setVoiceNum()
                 console.log(this.voiceNum)
+                this.updateUserData()
 
                 this.listen = false
                 this.play = true
@@ -106,7 +107,7 @@
                 // frequency = gamma (-90 \ 90)
                 // grain length = beta (-180 \ 180)
                 // start time = alpha (0 \ 360)
-                if(voice == 0) return
+                if(this.voiceNum == 0) return
                 
                 let pbRate = this.motion.x + this.motion.y + this.motion.z
                 let data = {
@@ -164,6 +165,7 @@
             }, 
             setVoiceNum() {
                 let activeVoices = []
+                console.log(this.userDataArray.length)
                 if (!this.userDataArray || this.userDataArray.length == 0) {
                     this.voiceNum = 1
                     return
