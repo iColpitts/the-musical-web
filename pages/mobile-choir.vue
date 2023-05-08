@@ -56,7 +56,7 @@
                 this.motionListener = window.addEventListener("devicemotion", this.handleMotion);
                 this.orientationListener = window.addEventListener("deviceorientation", this.handleOrientation);
                     
-                // this.userKey = randomWords({ exactly: 3, join: '-' })
+                this.userKey = randomWords({ exactly: 3, join: '-' })
                 this.voiceNum = getEmptyVoice()
 
                 this.listen = false
@@ -92,7 +92,7 @@
             setDbUser(newData) {
                 let db = useNuxtApp().$database
                 console.log('setting DB granulator')
-                set(ref(db, `users/${this.voiceNum}`), newData);
+                set(ref(db, `users/${this.userKey}`), newData);
             },
             updateUserData() {
                 // playback = acceleration
@@ -109,6 +109,7 @@
                     gain: 1,
                     panpos:0.5,
                     voiceNum: this.voiceNum,
+                    userKey: this.userKey,
 
                     minFreq: -90,
                     maxFreq: 90,
@@ -129,13 +130,14 @@
                 this.motion.x = e.acceleration.x
                 this.motion.y = e.acceleration.y
                 this.motion.z = e.acceleration.z
-                updateUserData()
+                this.updateUserData()
             },
             handleOrientation(e) {
                 this.orientation.on = true
                 this.orientation.alpha = e.alpha
                 this.orientation.beta = e.beta
-                this.orientation.gamma = e.gamma 
+                this.orientation.gamma = e.gamma
+                this.updateUserData() 
             },
             gyro_event (e) {
                 if (this.sensorData.time.length < 6000) {
