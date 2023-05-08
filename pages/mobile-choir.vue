@@ -93,20 +93,31 @@
                 set(ref(db, `users/${this.userKey}`), newData);
             },
             updateUserData() {
-
+                // playback = acceleration
+                // frequency = gamma (-90 \ 90)
+                // grain length = beta (-180 \ 180)
+                // start time = alpha (0 \ 360)
+                let pbRate = this.motion.x + this.motion.y + this.motion.z
                 let data = {
-                    frequency:1500,
-                    gain:0,
-                    grainLength:150,
-                    live:0,
-                    maxFreq:2000,
-                    maxGL:500,
-                    maxPB:500,
-                    maxST:500,
+                    pbRate: pbRate,
+                    startTime: this.orientation.alpha,
+                    grainLength: this.orientation.beta,
+                    frequency: this.orientation.gamma,
+
+                    gain: 1,
                     panpos:0.5,
-                    pbRate:560,
-                    startTime:0,
+                    voiceNum: this.voiceNum,
+
+                    minFreq: -90,
+                    maxFreq: 90,
+                    minGL: -180,
+                    maxGL: 180,
+                    minPB: 0,
+                    maxPB: 5,
+                    minST: 0,
+                    maxST: 360,
                 }
+                this.setDbUser(data)
             },
             handleMotion(e) {
                 this.motion.on = true
