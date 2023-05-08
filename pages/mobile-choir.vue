@@ -43,9 +43,8 @@
                 this.usersData = data
             });
 
-            const presenceRef = ref(db, "disconnectmessage");
-            // Write a string when this client loses connection
-            onDisconnect(presenceRef).remove(ref(db, `user/${this.userKey}`));
+            this.userKey = randomWords({ exactly: 3, join: '-' })
+            onDisconnect(ref(db,`users/${this.userKey}`)).remove();
 
         },
         methods: {
@@ -55,7 +54,6 @@
                 this.motionListener = window.addEventListener("devicemotion", this.handleMotion);
                 this.orientationListener = window.addEventListener("deviceorientation", this.handleOrientation);
                     
-                this.userKey = randomWords({ exactly: 3, join: '-' })
                 this.voiceNum = this.getNumUsers() + 1
                 console.log(this.voiceNum)
 
