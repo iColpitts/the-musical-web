@@ -48,10 +48,10 @@
                 const data = snapshot.val()
                 this.usersData = data
                 console.log('updating data')
-                // if (this.userDataArray && this.userDataArray.length > 0) {
-                //     this.userDataArray.forEach(array => this.updateSynthVoices(array[1]))
-                // }
-            });
+                if (this.userDataArray && this.userDataArray.length > 0) {
+                    this.userDataArray.forEach(array => this.updateSynthVoices(array[1]))
+                }
+            })
 
             this.userKey = randomWords({ exactly: 3, join: '-' })
             onDisconnect(ref(db,`users/${this.userKey}`)).remove()
@@ -164,7 +164,7 @@
             }, 
             setVoiceNum() {
                 let activeVoices = []
-                if (!this.userDataArray) {
+                if (!this.userDataArray || this.userDataArray.length == 0) {
                     this.voiceNum = 1
                     return
                 }
