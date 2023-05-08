@@ -180,7 +180,6 @@
 
                 let pbMin = this.rnboDevice.parametersById.get(`p_obj-8/pb-min`)
                 pbMin.value = data.minPB
-                
                 let pbMax = this.rnboDevice.parametersById.get(`p_obj-8/pb-max`)
                 pbMax.value = data.maxPB
 
@@ -188,6 +187,7 @@
                 stMin.value = data.minST
                 let stMax = this.rnboDevice.parametersById.get(`p_obj-8/st-min`)
                 stMax.value = data.minST
+
                 let buffer = this.rnboDevice.parametersById.get(`buffer`)
                 buffer.value = 'hymn'
 
