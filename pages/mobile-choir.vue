@@ -1,7 +1,7 @@
 <template>
     <div class="w-full h-full m-auto p-16">
         <div> 
-            <button v-if="!play" class="button" @click="setupPlay()">play</button> // <button v-if="!listen" class="button" @click="setupListen()">listen</button>
+            <button v-if="!play" class="button" @click="setupPlay()">play</button> <span v-if="this.voiceNum">{{ voiceNum }}</span> // <button v-if="!listen" class="button" @click="setupListen()">listen</button>
         </div>
         
         <div class="py-4"> 
@@ -165,7 +165,6 @@
             }, 
             setVoiceNum() {
                 let activeVoices = []
-                console.log(this.userDataArray.length)
                 if (!this.userDataArray || this.userDataArray.length == 0) {
                     this.voiceNum = 1
                     return
