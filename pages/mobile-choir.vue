@@ -18,6 +18,7 @@
     import Rnbo from "@rnbo/js";
     import patcher from '~/static/rnbo/basic-fm.export.json'    
     import randomWords from 'random-words';
+import { Param } from "tone";
 
     export default {
         data() {
@@ -35,12 +36,19 @@
                 orientationListener: null,
             }
         },
+        computed: {
+            userDataArray() {
+                if (!this.userData) return null
+                return Object.entries(this.usersData)
+            }
+        },
         mounted() {
             let db = useNuxtApp().$database
 
             onValue(ref(db, 'users/'), (snapshot) => {
-                const data = snapshot.val();
+                const data = snapshot.val()
                 this.usersData = data
+                if (this.userDataArray && this.userDataArray.length > 0) this.userDataArray.forEach(updateSynthVoices())
             });
 
             this.userKey = randomWords({ exactly: 3, join: '-' })
@@ -120,6 +128,28 @@
                 }
                 this.setDbUser(data)
             },
+            updateSynthVoices(data) {
+                let voice = data.voiceNum
+                console.log(this.rnboDevice.parameters/forEach(param => console.log(param.name)))  
+
+                this.rnboDevice.parametersById.get(`poly/${voice}/pb-rate`).value = data.pbRate
+                this.rnboDevice.parametersById.get(`poly/${voice}/frequency`).value = data.frequency
+                this.rnboDevice.parametersById.get(`poly/${voice}/grain-length`).value = data.grainLength
+                this.rnboDevice.parametersById.get(`poly/${voice}/starttime`).value = data.starttime
+                this.rnboDevice.parametersById.get(`gain`).value = 1
+
+                this.rnboDevice.parametersById.get(`poly/${voice}/freq-min`).value = data.minFreq
+                this.rnboDevice.parametersById.get(`poly/${voice}/freq-max`).value = data.maxFreq
+
+                this.rnboDevice.parametersById.get(`poly/${voice}/gl-min`).value = data.minGL
+                this.rnboDevice.parametersById.get(`poly/${voice}/gl-max`).value = data.maxGL
+
+                this.rnboDevice.parametersById.get(`poly/${voice}/pb-min`).value = data.minPB
+                this.rnboDevice.parametersById.get(`poly/${voice}/pb-max`).value = data.maxPB
+
+                this.rnboDevice.parametersById.get(`poly/${voice}/st-min`).value = data.minST
+                this.rnboDevice.parametersById.get(`poly/${voice}/st-min`).value = data.minST
+            },  
             getNumUsers() {
                 let userLength = Object.keys(this.usersData).length;
                 console.log(userLength)
@@ -138,14 +168,6 @@
                 this.orientation.beta = e.beta
                 this.orientation.gamma = e.gamma
                 this.updateUserData() 
-            },
-            gyro_event (e) {
-                if (this.sensorData.time.length < 6000) {
-                    this.sensorData.time.push(this.gyroscope.time)
-                    this.sensorData.x.push(this.gyroscope.x)
-                    this.sensorData.y.push(this.gyroscope.y)
-                    this.sensorData.z.push(this.gyroscope.z)
-                }
             }
         },        
     }
