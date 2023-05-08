@@ -16,9 +16,8 @@
 <script>
     import { ref, onValue, onDisconnect, set, remove } from "firebase/database"
     import Rnbo from "@rnbo/js";
-    import patcher from '~/static/rnbo/basic-fm.export.json'    
+    import patcher from '~/static/rnbo/final-grains.export.json'    
     import randomWords from 'random-words';
-import { Param } from "tone";
 
     export default {
         data() {
@@ -38,7 +37,7 @@ import { Param } from "tone";
         },
         computed: {
             userDataArray() {
-                if (!this.userData) return null
+                if (!this.usersData) return null
                 return Object.entries(this.usersData)
             }
         },
@@ -48,11 +47,15 @@ import { Param } from "tone";
             onValue(ref(db, 'users/'), (snapshot) => {
                 const data = snapshot.val()
                 this.usersData = data
-                if (this.userDataArray && this.userDataArray.length > 0) this.userDataArray.forEach(updateSynthVoices())
+                console.log('updating data')
+                // if (this.userDataArray && this.userDataArray.length > 0) {
+                //     this.userDataArray.forEach(array => this.updateSynthVoices(array[1]))
+                // }
             });
 
             this.userKey = randomWords({ exactly: 3, join: '-' })
-            onDisconnect(ref(db,`users/${this.userKey}`)).remove();
+            onDisconnect(ref(db,`users/${this.userKey}`)).remove()
+            this.setup()
 
         },
         methods: {
@@ -62,37 +65,35 @@ import { Param } from "tone";
                 this.motionListener = window.addEventListener("devicemotion", this.handleMotion);
                 this.orientationListener = window.addEventListener("deviceorientation", this.handleOrientation);
                     
-                this.voiceNum = this.getNumUsers() + 1
+                this.setVoiceNum()
                 console.log(this.voiceNum)
 
                 this.listen = false
                 this.play = true
                 
-                if(!this.rnboDevice) this.setup()
             },
             setupListen(){
                 console.log('listening...')
 
                 removeEventListener("devicemotion", this.motionListener)
                 removeEventListener("deviceorientation", this.orientationListener)
+                
+                let db = useNuxtApp().$database
+                remove(ref(db, `users/${this.userKey}`))
 
                 this.play= false
-                this.userKey = null
                 this.listen = true
-
-                if(!this.rnboDevice) this.setup()
             },
             async setup() {
                 console.log('setting up')
 
-                let WAContext = window.AudioContext || window.webkitAudioContext;
+                let WAContext = window.AudioContext || window.webkitAudioContext
                 this.context = new WAContext();
                 let context = this.context
 
-                this.rnboDevice = await Rnbo.createDevice({ context, patcher });
+                this.rnboDevice = await Rnbo.createDevice({ context, patcher })
 
-                this.rnboDevice.node.connect(context.destination);
-    
+                this.rnboDevice.node.connect(context.destination)
                 context.resume()
             },
             setDbUser(newData) {
@@ -105,6 +106,8 @@ import { Param } from "tone";
                 // frequency = gamma (-90 \ 90)
                 // grain length = beta (-180 \ 180)
                 // start time = alpha (0 \ 360)
+                if(voice == 0) return
+                
                 let pbRate = this.motion.x + this.motion.y + this.motion.z
                 let data = {
                     pbRate: pbRate,
@@ -129,17 +132,26 @@ import { Param } from "tone";
                 this.setDbUser(data)
             },
             updateSynthVoices(data) {
+                if (!this.rnboDevice) return
                 let voice = data.voiceNum
-                console.log(this.rnboDevice.parameters/forEach(param => console.log(param.name)))  
+                console.log(voice)
+                // this.rnboDevice.parameters.forEach(el => console.log(el.id))
 
-                this.rnboDevice.parametersById.get(`poly/${voice}/pb-rate`).value = data.pbRate
-                this.rnboDevice.parametersById.get(`poly/${voice}/frequency`).value = data.frequency
-                this.rnboDevice.parametersById.get(`poly/${voice}/grain-length`).value = data.grainLength
-                this.rnboDevice.parametersById.get(`poly/${voice}/starttime`).value = data.starttime
-                this.rnboDevice.parametersById.get(`gain`).value = 1
+                let pbParam = this.rnboDevice.parametersById.get(`poly/${voice}/pb-rate`)
+                pbParam.value = data.pbRate
+                let freqParam = this.rnboDevice.parametersById.get(`poly/${voice}/frequency`)
+                freqParam.value = data.frequency
+                let glParam = this.rnboDevice.parametersById.get(`poly/${voice}/grain-length`)
+                glParam.value = data.grainLength
+                let stParam = this.rnboDevice.parametersById.get(`poly/${voice}/starttime`)
+                stParam.value = data.starttime
+                let gain = this.rnboDevice.parametersById.get(`gain`)
+                gain.value = 1
 
-                this.rnboDevice.parametersById.get(`poly/${voice}/freq-min`).value = data.minFreq
-                this.rnboDevice.parametersById.get(`poly/${voice}/freq-max`).value = data.maxFreq
+                let freqMin = this.rnboDevice.parametersById.get(`poly/${voice}/freq-min`)
+                freqMin.value = data.minFreq
+                let freqMax= this.rnboDevice.parametersById.get(`poly/${voice}/freq-max`)
+                freqMax.value = data.maxFreq
 
                 this.rnboDevice.parametersById.get(`poly/${voice}/gl-min`).value = data.minGL
                 this.rnboDevice.parametersById.get(`poly/${voice}/gl-max`).value = data.maxGL
@@ -149,12 +161,27 @@ import { Param } from "tone";
 
                 this.rnboDevice.parametersById.get(`poly/${voice}/st-min`).value = data.minST
                 this.rnboDevice.parametersById.get(`poly/${voice}/st-min`).value = data.minST
-            },  
-            getNumUsers() {
-                let userLength = Object.keys(this.usersData).length;
-                console.log(userLength)
-                return userLength
-            },
+            }, 
+            setVoiceNum() {
+                let activeVoices = []
+                if (!this.userDataArray) {
+                    this.voiceNum = 1
+                    return
+                }
+                this.userDataArray.forEach(el => {
+                    activeVoices.push(el[1].voiceNum)
+                })
+                if (activeVoices.length > 4) return 0
+                const missing = []
+
+                for(let i=1; i<= 5; i++) {
+                    if(!activeVoices.includes(i)) { // Checking whether i(current value) present in num(argument)
+                        missing.push(i); // Adding numbers which are not in num(argument) array
+                    }
+                }
+                console.log(missing[0])
+                this.voiceNum = missing[0]
+            },   
             handleMotion(e) {
                 this.motion.on = true
                 this.motion.x = e.acceleration.x
