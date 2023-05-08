@@ -1,7 +1,7 @@
 <template>
     <div class="w-full h-full m-auto p-16">
         <div> 
-            <button v-if="!play" class="button" @click="setupPlay()">play</button><span v-if="this.userKey">{{ this.userKey }}</span> // <button v-if="!listen" class="button" @click="setupListen()">listen</button>
+            <button v-if="!play" class="button" @click="setupPlay()">play</button> // <button v-if="!listen" class="button" @click="setupListen()">listen</button>
         </div>
         
         <div class="py-4"> 
@@ -56,10 +56,12 @@
                 this.motionListener = window.addEventListener("devicemotion", this.handleMotion);
                 this.orientationListener = window.addEventListener("deviceorientation", this.handleOrientation);
                     
-                this.userKey = randomWords({ exactly: 3, join: '-' })
+                // this.userKey = randomWords({ exactly: 3, join: '-' })
+                this.voiceNum = getEmptyVoice()
 
                 this.listen = false
                 this.play = true
+                
                 if(!this.rnboDevice) this.setup()
             },
             setupListen(){
@@ -118,6 +120,9 @@
                     maxST: 360,
                 }
                 this.setDbUser(data)
+            },
+            getEmptyVoice() {
+                return this.usersData.find(el => el.gain = 0)
             },
             handleMotion(e) {
                 this.motion.on = true
