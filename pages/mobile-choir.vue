@@ -45,7 +45,7 @@
 
             const presenceRef = ref(db, "disconnectmessage");
             // Write a string when this client loses connection
-            onDisconnect(presenceRef).remove(ref(db, `user/${this.userKey}`),  );
+            onDisconnect(presenceRef).remove(ref(db, `user/${this.userKey}`));
 
         },
         methods: {
