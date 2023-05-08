@@ -59,6 +59,18 @@
 
         },
         methods: {
+            async setup() {
+                console.log('setting up')
+
+                let WAContext = window.AudioContext || window.webkitAudioContext
+                this.context = new WAContext();
+                let context = this.context
+
+                this.rnboDevice = await Rnbo.createDevice({ context, patcher })
+
+                this.rnboDevice.node.connect(context.destination)
+                context.resume()
+            },
             setupPlay() {
                 console.log('playing...')
 
@@ -84,18 +96,6 @@
 
                 this.play= false
                 this.listen = true
-            },
-            async setup() {
-                console.log('setting up')
-
-                let WAContext = window.AudioContext || window.webkitAudioContext
-                this.context = new WAContext();
-                let context = this.context
-
-                this.rnboDevice = await Rnbo.createDevice({ context, patcher })
-
-                this.rnboDevice.node.connect(context.destination)
-                context.resume()
             },
             setDbUser(newData) {
                 let db = useNuxtApp().$database
@@ -146,8 +146,8 @@
                 glParam.value = data.grainLength
                 let stParam = this.rnboDevice.parametersById.get(`poly/${voice}/starttime`)
                 stParam.value = data.starttime
-                let gain = this.rnboDevice.parametersById.get(`gain`)
-                gain.value = 1
+                // let gain = this.rnboDevice.parametersById.get(`gain`)
+                // gain.value = 1
 
                 let freqMin = this.rnboDevice.parametersById.get(`poly/${voice}/freq-min`)
                 freqMin.value = data.minFreq
