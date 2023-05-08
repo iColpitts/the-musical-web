@@ -16,9 +16,10 @@
 <script>
     import { ref, onValue, onDisconnect, set, remove } from "firebase/database"
     import Rnbo from "@rnbo/js";
-    import patcher from '~/static/rnbo/final-grains.export.json'    
+    import patcher from '~/static/rnbo/final-grains.export.json'
+    import dependanciesRaw from '~/static/rnbo/dependencies.json'   
     import randomWords from 'random-words';
-    import sample from '~/static/amen.mp3';
+    import sample from '~/static/rnbo/media/amen.mp3';
 
     export default {
         data() {
@@ -67,14 +68,31 @@
                 this.context = new WAContext();
                 let context = this.context
 
+                // // (Optional) Fetch the dependencies
+                // let dependencies = [];
+                // try {
+                //     dependencies = await dependenciesRaw.json();
+
+                //     // Prepend "export" to any file dependenciies - DELETE THIS PREPEND
+                //     dependencies = dependencies.map(d => d.file ? Object.assign({}, d, { file: d.file }) : d);
+                // } catch (e) {}
+
+                //  // (Optional) Load the samples
+                // if (dependencies.length)
+                //     await this.rnboDevice.loadDataBufferDependencies(dependencies);
+
                 this.rnboDevice = await Rnbo.createDevice({ context, patcher })
 
-                 const fileResponse = await fetch(sample);
+                const fileResponse = await fetch(sample);
 	            const arrayBuf = await fileResponse.arrayBuffer();
 
                 const audioBuf = await context.decodeAudioData(arrayBuf);
                 this.buffer = audioBuf
                 console.log(audioBuf)
+
+                // let buffer = this.rnboDevice.parametersById.get('buffer')
+                // buffer = audioBuf
+
                 await this.rnboDevice.setDataBuffer('hymn', audioBuf);
 
                 const outputNode = context.createGain();
@@ -95,7 +113,6 @@
 
                 this.listen = false
                 this.play = true
-                
             },
             setupListen(){
                 console.log('listening...')
@@ -147,15 +164,16 @@
             updateSynthVoices(data) {
                 if (!this.rnboDevice || !data) return
                 let voice = data.voiceNum
-                console.log(voice)
-                // this.rnboDevice.parameters.forEach(el => console.log(el.id))
 
                 let pbParam = this.rnboDevice.parametersById.get(`poly/${voice}/pb-rate`)
                 pbParam.value = data.pbRate
+
                 let freqParam = this.rnboDevice.parametersById.get(`poly/${voice}/frequency`)
                 freqParam.value = data.frequency
+
                 let glParam = this.rnboDevice.parametersById.get(`poly/${voice}/grain-length`)
                 glParam.value = data.grainLength
+
                 let stParam = this.rnboDevice.parametersById.get(`poly/${voice}/starttime`)
                 stParam.value = data.starttime
                 // let gain = this.rnboDevice.parametersById.get(`gain`)

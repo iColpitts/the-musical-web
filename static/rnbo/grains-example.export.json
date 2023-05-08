@@ -471,13 +471,13 @@
     "externalDataRefs": [
       {
         "id": "amen",
-        "file": "a. Original Sampled Amen 3-Bar Loop.mp3",
+        "file": "amen.mp3",
         "type": "Float32Buffer",
         "tag": "buffer~"
       },
       {
         "id": "hymn",
-        "file": "hymn-of-the-cherubim.mp3",
+        "file": "hymn.mp3",
         "type": "Float32Buffer",
         "tag": "buffer~"
       }

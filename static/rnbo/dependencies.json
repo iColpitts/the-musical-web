@@ -1,1 +1,12 @@
-[]
+[
+    [
+        {
+          "id": "hymn",
+          "file": "media/hymn.mp3"
+        },
+        {
+          "id": "amen",
+          "file": "media/amen.mp3"
+        }
+      ]
+]
