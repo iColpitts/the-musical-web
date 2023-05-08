@@ -90,7 +90,7 @@
             setDbUser(newData) {
                 let db = useNuxtApp().$database
                 console.log('setting DB granulator')
-                set(ref(db, `users/${this.userKey}`), newData);
+                set(ref(db, `users/${this.voiceNum}`), newData);
             },
             updateUserData() {
                 // playback = acceleration
