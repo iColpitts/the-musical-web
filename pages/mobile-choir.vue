@@ -14,7 +14,7 @@
 </template>
 
 <script>
-    import { ref, onValue, onDisconnect, set } from "firebase/database"
+    import { ref, onValue, onDisconnect, set, remove } from "firebase/database"
     import Rnbo from "@rnbo/js";
     import patcher from '~/static/rnbo/basic-fm.export.json'    
     import randomWords from 'random-words';
@@ -40,13 +40,12 @@
 
             onValue(ref(db, 'users/'), (snapshot) => {
                 const data = snapshot.val();
-                console.log(data)
                 this.usersData = data
             });
 
-            // const presenceRef = ref(db, "disconnectmessage");
-            // // Write a string when this client loses connection
-            // onDisconnect(presenceRef).set(ref(db, 'user/'),  );
+            const presenceRef = ref(db, "disconnectmessage");
+            // Write a string when this client loses connection
+            onDisconnect(presenceRef).remove(ref(db, `user/${this.userKey}`),  );
 
         },
         methods: {
@@ -57,7 +56,8 @@
                 this.orientationListener = window.addEventListener("deviceorientation", this.handleOrientation);
                     
                 this.userKey = randomWords({ exactly: 3, join: '-' })
-                this.voiceNum = getEmptyVoice()
+                this.voiceNum = this.getNumUsers() + 1
+                console.log(this.voiceNum)
 
                 this.listen = false
                 this.play = true
@@ -116,14 +116,16 @@
                     minGL: -180,
                     maxGL: 180,
                     minPB: 0,
-                    maxPB: 5,
+                    maxPB: 10,
                     minST: 0,
                     maxST: 360,
                 }
                 this.setDbUser(data)
             },
-            getEmptyVoice() {
-                return this.usersData.find(el => el.gain = 0)
+            getNumUsers() {
+                let userLength = Object.keys(this.usersData).length;
+                console.log(userLength)
+                return userLength
             },
             handleMotion(e) {
                 this.motion.on = true
