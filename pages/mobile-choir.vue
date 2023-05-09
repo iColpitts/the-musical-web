@@ -57,7 +57,7 @@
 
             this.userKey = randomWords({ exactly: 3, join: '-' })
             onDisconnect(ref(db,`users/${this.userKey}`)).remove()
-            this.setup()
+            //this.setup()
 
         },
         methods: {
@@ -96,6 +96,8 @@
                 await this.rnboDevice.setDataBuffer('hymn', audioBuf);
 
                 const outputNode = context.createGain();
+                outputNode.gain.setValueAtTime(1, context.currentTime)
+                console.log(outputNode.gain)
                 outputNode.connect(context.destination);
 
                 this.rnboDevice.node.connect(outputNode)
@@ -113,6 +115,8 @@
 
                 this.listen = false
                 this.play = true
+
+                if (!this.rnboDevice) this.setup()
             },
             setupListen(){
                 console.log('listening...')
@@ -125,6 +129,8 @@
 
                 this.play= false
                 this.listen = true
+
+                if(!this.rnboDevice) this.setup()
             },
             setDbUser(newData) {
                 let db = useNuxtApp().$database
@@ -140,10 +146,14 @@
                 
                 let pbRate = this.motion.x + this.motion.y + this.motion.z
                 let data = {
-                    pbRate: pbRate,
-                    startTime: this.orientation.alpha,
-                    grainLength: this.orientation.beta,
-                    frequency: this.orientation.gamma,
+                    // pbRate: pbRate,
+                    // startTime: this.orientation.alpha,
+                    // grainLength: this.orientation.beta,
+                    // frequency: this.orientation.gamma,
+                    pbRate: 0,
+                    strattime: 29,
+                    grainLength: 41,
+                    freq: 1497,
 
                     gain: 1,
                     panpos:0.5,
